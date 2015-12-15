@@ -54,7 +54,6 @@
     <Compile Include="day1.fs" />
     <Content Include="input7_example_resequence.txt" />
     <Content Include="input1.txt" />
-    <Compile Include="day7try2.fs" />
     <Compile Include="day7.fs" />
     <Content Include="input7_part2.txt" />
     <Content Include="input7_example.txt" />

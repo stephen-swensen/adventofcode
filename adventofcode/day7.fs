@@ -1,4 +1,4 @@
-﻿module day7
+﻿module day7try2
 
 open System
 
@@ -11,9 +11,9 @@ type Expr =
     | RShift of Expr * int
     | Not of Expr
 
-let rec eval expr env =
+let rec eval expr (env:System.Collections.Generic.Dictionary<_,Lazy<_>>) =
     match expr with
-    | Var x -> env |> Map.find x
+    | Var x -> (env.[x]).Force()
     | Value x -> x
     | And (x, y) -> eval x env &&& eval y env
     | Or (x, y) -> eval x env ||| eval y env
@@ -24,8 +24,9 @@ let rec eval expr env =
 let rec evalStmts stmts env =
     match stmts with
     | (var, expr)::stmts ->
-        let x = eval expr env
-        evalStmts stmts (env |> Map.add var x)
+        let x = lazy(eval expr env)
+        env.[var] <- x
+        evalStmts stmts env
     | [] ->
         env
 
@@ -53,41 +54,14 @@ let parseStmt (str:string) =
         (ident, Not(x))
     | _ -> failwithf "input not recognized: %A" tokens
 
-let lines = System.IO.File.ReadAllLines(@"c:\sb\adventofcode\adventofcode\input7.txt")
-let stmts = lines |> Seq.map parseStmt |> Seq.toList
-let env = evalStmts stmts Map.empty
-let answer = env |> Map.find "a"
+let part1 =
+    let lines = System.IO.File.ReadAllLines(@"c:\sb\adventofcode\adventofcode\input7.txt")
+    let stmts = lines |> Seq.map parseStmt |> Seq.toList
+    let env = evalStmts stmts (System.Collections.Generic.Dictionary<_,_>())
+    (env.["a"]).Force()
 
-let input = "123 -> x
-456 -> y
-x AND y -> d
-x OR y -> e
-x LSHIFT 2 -> f
-y RSHIFT 2 -> g
-NOT x -> h
-NOT y -> i"
-
-let ``day 7 part 1 formal`` =
-    let stmts = [
-        "x", Value(123us)
-        "y", Value(456us)
-        "d", (And(Var("x"), Var("y")))
-        "e", (Or(Var("x"), Var("y")))
-        "f", (LShift(Var("x"), 2))
-        "g", (RShift(Var("y"), 2))
-        "h", (Not(Var("x")))
-        "i", (Not(Var("y")))
-    ]
-    evalStmts stmts Map.empty
-
-let ``day 7 part 1`` =
-    let mutable env = Map.empty
-    env <- env.Add ('x', 123us)
-    env <- env.Add ('y', 456us)
-    env <- env.Add ('d', env.['x'] &&& env.['y'])
-    env <- env.Add ('e', env.['x'] ||| env.['y'])
-    env <- env.Add ('f', env.['x'] <<< 2)
-    env <- env.Add ('g', env.['y'] >>> 2)
-    env <- env.Add ('h', ~~~ env.['x'])
-    env <- env.Add ('i', ~~~ env.['y'])
-    env
+let part2 =
+    let lines = System.IO.File.ReadAllLines(@"c:\sb\adventofcode\adventofcode\input7_part2.txt")
+    let stmts = lines |> Seq.map parseStmt |> Seq.toList
+    let env = evalStmts stmts (System.Collections.Generic.Dictionary<_,_>())
+    (env.["a"]).Force()
