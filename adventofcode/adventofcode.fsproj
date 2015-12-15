@@ -51,10 +51,10 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="day1.fs" />
+    <None Include="day1.fsx" />
     <Content Include="input7_example_resequence.txt" />
     <Content Include="input1.txt" />
-    <Compile Include="day7.fs" />
+    <None Include="day7.fsx" />
     <Content Include="input7_part2.txt" />
     <Content Include="input7_example.txt" />
     <Content Include="input7.txt" />

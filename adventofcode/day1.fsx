@@ -1,4 +1,5 @@
-﻿module day1
+﻿[<AutoOpen>]
+module day1
 
 open System
 

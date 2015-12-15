@@ -1,5 +1,5 @@
-﻿module day7
-
+﻿[<AutoOpen>]
+module day7
 open System
 
 type Expr =
