@@ -58,6 +58,8 @@
     <Content Include="input7_part2.txt" />
     <Content Include="input7_example.txt" />
     <Content Include="input7.txt" />
+    <None Include="day12.fsx" />
+    <Content Include="input12.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
