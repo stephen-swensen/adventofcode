@@ -1,4 +1,4 @@
-﻿module day7try2
+﻿module day7
 
 open System
 
