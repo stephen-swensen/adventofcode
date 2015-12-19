@@ -1,5 +1,5 @@
 ﻿[<AutoOpen>]
-module day1_fast
+module day12_fast
 
 open System
 open System.Numerics
