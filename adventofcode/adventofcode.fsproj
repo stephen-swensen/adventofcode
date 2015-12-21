@@ -51,6 +51,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="JsonParser.fs" />
     <None Include="day1.fsx" />
     <Content Include="input7_example_resequence.txt" />
     <Content Include="input1.txt" />
@@ -58,8 +59,9 @@
     <Content Include="input7_part2.txt" />
     <Content Include="input7_example.txt" />
     <Content Include="input7.txt" />
-    <None Include="day12.fsx" />
     <Content Include="input12.txt" />
+    <None Include="day12.fsx" />
+    <None Include="day12_fast.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
