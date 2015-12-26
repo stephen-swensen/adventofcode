@@ -7,11 +7,11 @@ open System.Text.RegularExpressions
 type jtoken =
     | LBrace | RBrace | Colon | Comma | LBracket | RBracket
     | String of string
-    | Int of int
+    | Number of double
 type T = jtoken
 
 type jexpr =
-    | Int of int
+    | Number of double
     | String of string
     | Array of jexpr list
     | Object of (string * jexpr) list
@@ -31,38 +31,54 @@ module Parser =
             aux startIndex
 
     let tokenize (s:string) =
-        let isNumChar c = let cint = int(c) in cint >= 48 && cint <= 57
+        let isNumChar c = 
+            let cint = int(c) in 
+                (cint >= 48 && cint <= 57) || c = 'e' || c = 'E' || c = '-' || c = '+' || c = '.'
 
-        List.unfold (fun index ->
-            if index = s.Length then None
-            else
+        seq {
+            let mutable index = 0
+            while index <> s.Length do
                 let nextChar = s.[index]
-                let t, nextIndex =
-                    match nextChar with
-                    | '{' -> T.LBrace, index+1
-                    | '}' -> T.RBrace, index+1
-                    | '[' -> T.LBracket, index+1
-                    | ']' -> T.RBracket, index+1
-                    | ':' -> T.Colon, index+1
-                    | ',' -> T.Comma, index+1
-                    | _ when nextChar = '-' || nextChar |> isNumChar ->
-                        let firstNonNumCharIndex = s.IndexOf(index+1, isNumChar>>not)
-                        T.Int(Int32.Parse(s.Substring(index, firstNonNumCharIndex-index))), firstNonNumCharIndex
-                    | '"' ->
-                        let firstQuoteCharIndex = s.IndexOf(index+1, (=) '"')
-                        T.String(s.Substring(index+1, firstQuoteCharIndex-index-1)), firstQuoteCharIndex+1
-                    | _ -> failwithf "token not found: i=%A, nextChar=%A" index nextChar
-                    
-                Some(t,nextIndex)
-        ) 0
+                match nextChar with
+                | '{' -> 
+                    yield T.LBrace
+                    index <- index + 1
+                | '}' -> 
+                    yield T.RBrace
+                    index <- index + 1
+                | '[' -> 
+                    yield T.LBracket
+                    index <- index + 1
+                | ']' -> 
+                    yield T.RBracket
+                    index <- index + 1
+                | ':' -> 
+                    yield T.Colon
+                    index <- index + 1
+                | ',' -> 
+                    yield T.Comma
+                    index <- index + 1
+                | _ when nextChar = '-' || nextChar |> isNumChar ->
+                    let firstNonNumCharIndex = s.IndexOf(index+1, isNumChar>>not)
+                    yield T.Number(Double.Parse(s.Substring(index, firstNonNumCharIndex-index)))
+                    index <- firstNonNumCharIndex
+                | '"' ->
+                    let firstQuoteCharIndex = s.IndexOf(index+1, (=) '"')
+                    yield T.String(s.Substring(index+1, firstQuoteCharIndex-index-1))
+                    index <- firstQuoteCharIndex+1
+                | ' ' | '\r' | '\n' | '\t' ->
+                    index <- index + 1
+                | _ -> 
+                    failwithf "token not found: i=%A, nextChar=%A" index nextChar
+        } |> Seq.toList
 
     let parse tokens = 
         //token list -> (expression production * remaining token list)
         //t is "tail"
         let rec (|Value|_|) tokens = 
             match tokens with        
-            | T.Int(n)::t -> 
-                Some(E.Int(n),t)
+            | T.Number(n)::t -> 
+                Some(E.Number(n),t)
             | T.String(s)::t -> 
                 Some(E.String(s),t)
             //                    T.RBrace pops the closing brace off the tail
