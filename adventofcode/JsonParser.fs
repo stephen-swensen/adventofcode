@@ -37,27 +37,16 @@ module Parser =
 
         seq {
             let mutable index = 0
+            let inc() = index <- index + 1
             while index <> s.Length do
                 let nextChar = s.[index]
                 match nextChar with
-                | '{' -> 
-                    yield T.LBrace
-                    index <- index + 1
-                | '}' -> 
-                    yield T.RBrace
-                    index <- index + 1
-                | '[' -> 
-                    yield T.LBracket
-                    index <- index + 1
-                | ']' -> 
-                    yield T.RBracket
-                    index <- index + 1
-                | ':' -> 
-                    yield T.Colon
-                    index <- index + 1
-                | ',' -> 
-                    yield T.Comma
-                    index <- index + 1
+                | '{' -> yield T.LBrace; inc()
+                | '}' -> yield T.RBrace; inc()
+                | '[' -> yield T.LBracket; inc()
+                | ']' -> yield T.RBracket; inc()
+                | ':' -> yield T.Colon; inc()
+                | ',' -> yield T.Comma; inc()
                 | _ when nextChar = '-' || nextChar |> isNumChar ->
                     let firstNonNumCharIndex = s.IndexOf(index+1, isNumChar>>not)
                     yield T.Number(Double.Parse(s.Substring(index, firstNonNumCharIndex-index)))
@@ -67,7 +56,7 @@ module Parser =
                     yield T.String(s.Substring(index+1, firstQuoteCharIndex-index-1))
                     index <- firstQuoteCharIndex+1
                 | ' ' | '\r' | '\n' | '\t' ->
-                    index <- index + 1
+                    inc()
                 | _ -> 
                     failwithf "token not found: i=%A, nextChar=%A" index nextChar
         } |> Seq.toList
