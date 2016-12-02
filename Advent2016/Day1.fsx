@@ -2,34 +2,22 @@
 open System
 
 ///Directions for a movement: Right or Left a number of steps
-type Movement = R of int | L of int with
-    member this.Magnitude = 
-        match this with
-        | R m | L m -> m
+type Movement = R of int | L of int
 
 ///Orientation in the vector space: North, South, East, West
-type Orientation = N | S | E | W with
-    member this.UnitDirection = 
-        match this with
-        | N -> (1, 0)
-        | E -> (0, -1)
-        | S -> (-1, 0)
-        | W -> (0, 1)
-    member this.Rotate(movement) =
+module Orientation = 
+    let N = (1, 0)
+    let E = (0, -1)
+    let S = (-1, 0)
+    let W = (0, 1)
+
+    let rotate (orientation:int*int) movement =
         match movement with
-        | R _ -> 
-            match this with
-            | N -> E 
-            | E -> S 
-            | S -> W 
-            | W -> N 
-        | L _ -> 
-            match this with
-            | N -> W 
-            | W -> S 
-            | S -> E 
-            | E -> N 
-        
+        | R _ -> [(N,E);(E,S);(S,W);(W,N)]  
+        | L _ -> [(N,W);(W,S);(S,E);(E,N)]
+        |> Seq.find (fun (x,_) -> x = orientation)
+        |> snd
+
 ///Parse the input into a list of Movements
 let movements = 
     let input = readText "input1_part1.txt"
@@ -43,17 +31,17 @@ let movements =
 
 ///Starting at origin (0,0) and facing North, follow the Movement directions, yielding the coordinates of every step
 let walk movements =
-    let rec walk (movements:Movement list) ((cur_x, cur_y) as cur) (orientation:Orientation) = seq {
+    let rec walk movements ((cur_x, cur_y) as cur) orientation = seq {
         match movements with
         | [] -> yield cur 
         | movement::movements' ->
-            let m = movement.Magnitude
-            let (vx,vy) = orientation.UnitDirection
+            let (R m | L m) = movement
+            let ((vx,vy) as orientation') = Orientation.rotate orientation movement
             //expand steps between cur and destination
             let steps = Seq.scan (fun (x',y') _ -> x'+vx, y'+vy) cur [1..m]
             yield! steps |> Seq.take m // yield all but the last element
-            yield! walk movements' (steps |> Seq.last) (orientation.Rotate(movement)) }
-    walk movements (0,0) N
+            yield! walk movements' (steps |> Seq.last) orientation' }
+    walk movements (0,0) Orientation.N
 
 let part1 = 
     let (x,y) = walk movements |> Seq.last
