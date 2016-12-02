@@ -13,23 +13,43 @@ let movements =
         | 'L'::Int'(m) -> L m)
     |> Seq.toList
 
-let rec walk movements ((cur_x, cur_y) as cur) orientation =
+let rec walk movements ((cur_x, cur_y) as cur) orientation = seq {
     match movements with
-    | [] -> cur
+    | [] -> yield cur 
     | movement::movements' ->
-        match movement with
-        | R m -> 
-            match orientation with
-            | N -> walk movements' (cur_x + m, cur_y) E 
-            | E -> walk movements' (cur_x, cur_y - m) S 
-            | S -> walk movements' (cur_x - m, cur_y) W 
-            | W -> walk movements' (cur_x, cur_y + m) N 
-        | L m -> 
-            match orientation with
-            | N -> walk movements' (cur_x - m, cur_y) W 
-            | W -> walk movements' (cur_x, cur_y - m) S 
-            | S -> walk movements' (cur_x + m, cur_y) E 
-            | E -> walk movements' (cur_x, cur_y + m) N 
+        
+        let m, (vx,vy), orientation' =
+            match movement with
+            | R m -> 
+                match orientation with
+                | N -> m, (1, 0), E 
+                | E -> m, (0, -1), S 
+                | S -> m, (-1, 0), W 
+                | W -> m, (0, 1), N 
+            | L m -> 
+                match orientation with
+                | N -> m, (-1, 0), W 
+                | W -> m, (0, -1), S 
+                | S -> m, (1, 0), E 
+                | E -> m, (0, 1), N 
+        
+        //expand steps between cur and destination
+        let steps = Seq.scan (fun (x',y') _ -> x'+vx, y'+vy) cur [1..m]
+        yield! steps |> Seq.take m // yield all but the last element
+        yield! walk movements' (steps |> Seq.last) orientation' }
 
-let (x,y) = walk movements (0,0) N
-let distance = Math.Abs(x) + Math.Abs(y)
+let part1 = 
+    let (x,y) = walk movements (0,0) N |> Seq.last
+    Math.Abs(x) + Math.Abs(y)
+
+let part2 =
+    let (x,y) = 
+        let locations' =
+            let locations = walk movements (0,0) N |> Seq.toList
+            let rec walk' (cur::locations') visited = seq {
+                if visited |> Seq.contains cur then yield! (cur::visited)
+                else yield! walk' locations' (cur::visited) }
+            walk' locations [] |> Seq.rev
+        printfn "locations: %A" locations'
+        locations' |> Seq.last
+    Math.Abs(x) + Math.Abs(y)
