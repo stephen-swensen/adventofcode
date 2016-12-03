@@ -26,7 +26,7 @@ let instructions =
     let input = readLines "input2_part1.txt"
     input
     |> Seq.map (fun line ->
-        line |> Seq.map (fun c -> printfn "%A" c; match c with 'U' -> U | 'D' -> D | 'L' -> L | 'R' -> R))
+        line |> Seq.map (function 'U' -> U | 'D' -> D | 'L' -> L | 'R' -> R))
 
 let move ((x,y) as cur) inst =
     let (x',y') = unitVector inst
