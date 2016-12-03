@@ -30,20 +30,20 @@ let keypadCodes keypad initialCoord =
     instructions
     |> Seq.scan nextKey initialCoord
     |> Seq.skip 1
-    |> Seq.map (fun coord -> keypad |> Seq.find (fun (_,coord') -> coord=coord') |> fst)
-    |> Seq.toList
+    |> Seq.map (fun coord -> keypad |> Seq.find (fun (_,coord') -> coord=coord') |> fst |> string)
+    |> Seq.reduce (+)
 
 let part1 =
     let keypad = [
-        7, (0,0)
-        8, (1,0)
-        9, (2,0)
-        4, (0,1)
-        5, (1,1)
-        6, (2,1)
-        1, (0,2)
-        2, (1,2)
-        3, (2,2) ]
+        '7', (0,0)
+        '8', (1,0)
+        '9', (2,0)
+        '4', (0,1)
+        '5', (1,1)
+        '6', (2,1)
+        '1', (0,2)
+        '2', (1,2)
+        '3', (2,2) ]
     keypadCodes keypad (1,1)
 
 let part2 =
