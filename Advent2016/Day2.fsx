@@ -9,13 +9,14 @@ let unitVector = function
     | L -> (-1,0)
     | R -> (1,0)
 
+let instructions =
+    let input = readLines "input2_part1.txt"
+    input
+    |> Seq.map (fun line ->
+        line |> Seq.map (function 'U' -> U | 'D' -> D | 'L' -> L | 'R' -> R))
+
 let keypadCodes keypad initialCoord = 
     let keypadCoords = keypad |> List.map snd
-    let instructions =
-        let input = readLines "input2_part1.txt"
-        input
-        |> Seq.map (fun line ->
-            line |> Seq.map (function 'U' -> U | 'D' -> D | 'L' -> L | 'R' -> R))
 
     let move ((x,y) as cur) inst =
         let (x',y') = unitVector inst
