@@ -13,9 +13,8 @@ let readLines path =
     File.ReadAllLines path
 
 let split (delimiter:string) (input:string) =
-    let result = input.Split([|delimiter|], StringSplitOptions.None)
-    if result = [|input|] then Seq.empty //nothing was split
-    else upcast result
+    let result = input.Split([|delimiter|], StringSplitOptions.RemoveEmptyEntries)
+    result
 
 ///Try parse string to int
 let (|Int|_|) str =

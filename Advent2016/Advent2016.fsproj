@@ -56,6 +56,8 @@
     <Content Include="input1_part1.txt" />
     <None Include="Day2.fsx" />
     <Content Include="input2_part1.txt" />
+    <None Include="Day3.fsx" />
+    <Content Include="input3_part1.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
