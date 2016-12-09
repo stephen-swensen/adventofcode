@@ -2,15 +2,14 @@
 open System
 open System.Text.RegularExpressions
 
-let room = "aaaaa-bbb-zyx" 
-let line = "aaaaa-bbb-z-y-x-123[abxyz]"
-
 let parseLine line =
     let m = Regex.Match(line, "(.*)-(.*)\[(.*)\]")
     let room = m.Groups.[1].Value
     let sector = m.Groups.[2].Value |> int
     let checksum = m.Groups.[3].Value
     room,sector,checksum
+
+let input = readLines "input4_part1.txt" |> Seq.map parseLine
 
 let genChecksum room =
     room
@@ -22,4 +21,9 @@ let genChecksum room =
     |> Seq.take 5
     |> String.concat "" 
 
-genChecksum "not-a-real-room"
+let part1 =
+    input
+    |> Seq.sumBy (fun (room, sector, checksum) ->
+        let checksum' = genChecksum room
+        if checksum' = checksum then sector
+        else 0)
